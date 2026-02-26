@@ -11,21 +11,21 @@ const SOURCE_CONFIG: Record<
 > = {
     linkedin: {
         label: "LinkedIn",
-        color: "text-sky-300",
-        bg: "bg-sky-500/10 border-sky-500/30",
-        dot: "bg-sky-400",
+        color: "text-sky-700",
+        bg: "bg-sky-50 border-sky-200",
+        dot: "bg-sky-500",
     },
     indeed: {
         label: "Indeed",
-        color: "text-blue-300",
-        bg: "bg-blue-500/10 border-blue-500/30",
-        dot: "bg-blue-400",
+        color: "text-blue-700",
+        bg: "bg-blue-50 border-blue-200",
+        dot: "bg-blue-500",
     },
     google: {
         label: "Google Jobs",
-        color: "text-emerald-300",
-        bg: "bg-emerald-500/10 border-emerald-500/30",
-        dot: "bg-emerald-400",
+        color: "text-emerald-700",
+        bg: "bg-emerald-50 border-emerald-200",
+        dot: "bg-emerald-500",
     },
 };
 
@@ -33,9 +33,9 @@ function getSourceConfig(source: JobSource) {
     return (
         SOURCE_CONFIG[source.toLowerCase()] || {
             label: source,
-            color: "text-slate-300",
-            bg: "bg-slate-500/10 border-slate-500/30",
-            dot: "bg-slate-400",
+            color: "text-ink-mid",
+            bg: "bg-surface-alt border-glacier/50",
+            dot: "bg-ink-soft",
         }
     );
 }
@@ -77,9 +77,9 @@ export default function JobCard({ job }: JobCardProps) {
         : job.description;
 
     return (
-        <article className="group relative flex flex-col rounded-2xl bg-slate-900/60 border border-slate-700/50 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 overflow-hidden">
+        <article className="group relative flex flex-col rounded-2xl bg-surface border border-glacier/60 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 overflow-hidden">
             {/* Top accent line */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-indigo-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-accent/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
             <div className="p-5 flex flex-col gap-4 flex-1">
                 {/* Header row */}
@@ -90,13 +90,13 @@ export default function JobCard({ job }: JobCardProps) {
                             <img
                                 src={job.companyLogo}
                                 alt={job.company}
-                                className="w-11 h-11 rounded-xl object-contain bg-white/5 border border-slate-700/60 p-1"
+                                className="w-11 h-11 rounded-xl object-contain bg-bg border border-glacier/50 p-1"
                                 onError={(e) => {
                                     (e.target as HTMLImageElement).style.display = "none";
                                 }}
                             />
                         ) : (
-                            <div className="w-11 h-11 rounded-xl bg-linear-to-br from-indigo-600/30 to-violet-600/30 border border-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-300">
+                            <div className="w-11 h-11 rounded-xl bg-linear-to-br from-primary-tint to-glacier/30 border border-glacier flex items-center justify-center text-xs font-bold text-primary">
                                 {initials}
                             </div>
                         )}
@@ -104,10 +104,10 @@ export default function JobCard({ job }: JobCardProps) {
 
                     {/* Title + company */}
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-white text-base leading-snug line-clamp-2 group-hover:text-indigo-200 transition-colors">
+                        <h3 className="font-semibold text-ink text-base leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                             {job.title}
                         </h3>
-                        <p className="text-slate-400 text-sm mt-0.5 truncate">{job.company}</p>
+                        <p className="text-ink-mid text-sm mt-0.5 truncate">{job.company}</p>
                     </div>
 
                     {/* Source badge */}
@@ -120,7 +120,7 @@ export default function JobCard({ job }: JobCardProps) {
                 </div>
 
                 {/* Meta row */}
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-ink-mid">
                     {/* Location */}
                     {job.location && (
                         <span className="inline-flex items-center gap-1">
@@ -134,7 +134,7 @@ export default function JobCard({ job }: JobCardProps) {
 
                     {/* Remote badge */}
                     {job.isRemote && (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 font-medium">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 px-2 py-0.5 font-medium">
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                             </svg>
@@ -144,20 +144,20 @@ export default function JobCard({ job }: JobCardProps) {
 
                     {/* Job type */}
                     {job.jobType && (
-                        <span className="inline-flex items-center rounded-md bg-violet-500/15 border border-violet-500/30 text-violet-300 px-2 py-0.5 font-medium capitalize">
+                        <span className="inline-flex items-center rounded-md bg-primary-tint border border-glacier text-primary px-2 py-0.5 font-medium capitalize">
                             {job.jobType.replace(/_/g, " ")}
                         </span>
                     )}
 
                     {/* Date */}
                     {dateLabel && (
-                        <span className="ml-auto text-slate-500">{dateLabel}</span>
+                        <span className="ml-auto text-ink-soft">{dateLabel}</span>
                     )}
                 </div>
 
                 {/* Salary */}
                 {job.salary && (
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-amber-300">
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-accent">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -167,12 +167,12 @@ export default function JobCard({ job }: JobCardProps) {
 
                 {/* Description */}
                 {job.description && (
-                    <div className="text-sm text-slate-400 leading-relaxed">
+                    <div className="text-sm text-ink-mid leading-relaxed">
                         <p>{expanded ? job.description : shortDesc}</p>
                         {isLong && (
                             <button
                                 onClick={() => setExpanded((v) => !v)}
-                                className="mt-1 text-indigo-400 hover:text-indigo-300 text-xs font-medium transition-colors"
+                                className="mt-1 text-primary hover:text-primary-dim text-xs font-medium transition-colors"
                             >
                                 {expanded ? "Show less ↑" : "Show more ↓"}
                             </button>
@@ -187,7 +187,7 @@ export default function JobCard({ job }: JobCardProps) {
                     href={job.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full rounded-xl bg-indigo-600/15 hover:bg-indigo-600/30 border border-indigo-500/30 hover:border-indigo-400/50 text-indigo-300 hover:text-indigo-200 text-sm font-medium py-2.5 transition-all duration-200"
+                    className="flex items-center justify-center gap-2 w-full rounded-xl bg-accent hover:bg-accent-dim text-white text-sm font-medium py-2.5 transition-all duration-200"
                 >
                     View Job
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

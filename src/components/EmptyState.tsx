@@ -1,9 +1,9 @@
 export default function EmptyState() {
     return (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-surface border border-glacier/60 flex items-center justify-center mb-4">
                 <svg
-                    className="w-7 h-7 text-slate-600"
+                    className="w-7 h-7 text-ink-mid"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -16,8 +16,8 @@ export default function EmptyState() {
                     />
                 </svg>
             </div>
-            <p className="text-slate-300 font-medium text-base mb-1">No jobs match this filter</p>
-            <p className="text-slate-500 text-sm">Try a different source or search with new keywords.</p>
+            <p className="text-ink font-medium text-base mb-1">No jobs match this filter</p>
+            <p className="text-ink-mid text-sm">Try a different source or search with new keywords.</p>
         </div>
     );
 }

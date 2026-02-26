@@ -25,15 +25,15 @@ export default function FilterBar({ active, counts, onChange }: FilterBarProps) 
                         key={key}
                         onClick={() => onChange(key)}
                         className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium border transition-all ${isActive
-                                ? "bg-indigo-600/25 border-indigo-500/60 text-indigo-200"
-                                : "bg-slate-800/60 border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-600"
+                            ? "bg-primary border-primary text-white"
+                            : "bg-surface border-glacier/50 text-ink-mid hover:text-ink hover:border-primary/50"
                             }`}
                     >
                         {label}
                         <span
                             className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${isActive
-                                    ? "bg-indigo-500/30 text-indigo-200"
-                                    : "bg-slate-700/60 text-slate-500"
+                                ? "bg-white/20 text-white"
+                                : "bg-primary-tint text-ink-mid"
                                 }`}
                         >
                             {count}

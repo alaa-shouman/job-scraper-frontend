@@ -73,7 +73,7 @@ export default function App() {
       : jobs.filter((j) => j?.source?.toLowerCase() === activeFilter);
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white">
+    <div className="min-h-screen bg-bg text-ink">
       <Header
         totalJobs={state === "success" ? totalJobs : undefined}
         isCached={cacheStatus.cached}
@@ -93,13 +93,13 @@ export default function App() {
         {/* Results area */}
         {state === "idle" && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-linear-to-br from-indigo-600/20 to-violet-600/20 border border-indigo-500/20 flex items-center justify-center mb-5">
-              <svg className="w-9 h-9 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-20 h-20 rounded-3xl bg-primary-tint border border-glacier flex items-center justify-center mb-5">
+              <svg className="w-9 h-9 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />
               </svg>
             </div>
-            <p className="text-slate-300 font-semibold text-lg mb-2">Start your job search</p>
-            <p className="text-slate-500 text-sm max-w-md">
+            <p className="text-ink font-semibold text-lg mb-2">Start your job search</p>
+            <p className="text-ink-mid text-sm max-w-md">
               Add keywords to search LinkedIn &amp; Indeed, or a free-text query for Google Jobs.
               Results are cached for 10 minutes.
             </p>
@@ -109,10 +109,10 @@ export default function App() {
                 { icon: "🔍", label: "Indeed", desc: "World's #1 job site" },
                 { icon: "🌐", label: "Google Jobs", desc: "Global job board" },
               ].map((s) => (
-                <div key={s.label} className="rounded-xl bg-slate-900/50 border border-slate-800 px-4 py-3">
+                <div key={s.label} className="rounded-xl bg-surface border border-glacier/50 px-4 py-3">
                   <div className="text-2xl mb-1">{s.icon}</div>
-                  <div className="text-sm font-medium text-slate-300">{s.label}</div>
-                  <div className="text-xs text-slate-500">{s.desc}</div>
+                  <div className="text-sm font-medium text-ink">{s.label}</div>
+                  <div className="text-xs text-ink-mid">{s.desc}</div>
                 </div>
               ))}
             </div>
@@ -121,7 +121,7 @@ export default function App() {
 
         {state === "loading" && (
           <section className="space-y-4">
-            <div className="h-8 w-40 rounded-lg bg-slate-800/60 animate-pulse" />
+            <div className="h-8 w-40 rounded-lg bg-glacier/30 animate-pulse" />
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <SkeletonCard key={i} />
@@ -146,7 +146,7 @@ export default function App() {
                 counts={counts}
                 onChange={setActiveFilter}
               />
-              <p className="text-xs text-slate-500 shrink-0">
+              <p className="text-xs text-ink-mid shrink-0">
                 Showing {visibleJobs.length} of {totalJobs} jobs
               </p>
             </div>
@@ -164,7 +164,7 @@ export default function App() {
         )}
       </main>
 
-      <footer className="border-t border-slate-800/60 mt-16 py-6 text-center text-xs text-slate-600">
+      <footer className="border-t border-glacier/40 mt-16 py-6 text-center text-xs text-ink-soft">
         JobScraper &mdash; Results sourced from LinkedIn, Indeed &amp; Google Jobs
       </footer>
     </div>

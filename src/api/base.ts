@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig, type AxiosResponse } from "axios";
 import { getCached, setCache, buildJobsCacheKey } from "../utils/cache";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -14,51 +14,80 @@ interface ApiOptions {
   skipCache?: boolean;
 }
 
-const baseURL = import.meta.env.VITE_BASE_URL;
+// ─── Axios instance ───────────────────────────────────────────────────────────
+
+const http = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL || "http://localhost:3000/api",
+  headers: { "Content-Type": "application/json" },
+});
+
+// ─── Request interceptor ─────────────────────────────────────────────────────
+
+http.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const { method, url, params, data } = config;
+    console.groupCollapsed(`%c ↑ ${method?.toUpperCase()} ${url}`, "color:#264653; font-weight:600;");
+    if (params) console.log("Params:", params);
+    if (data) console.log("Body:  ", typeof data === "string" ? JSON.parse(data) : data);
+    console.groupEnd();
+    return config;
+  },
+  (error: AxiosError) => {
+    console.error("% Request setup error:", error.message);
+    return Promise.reject(error);
+  },
+);
+
+// ─── Response interceptor ────────────────────────────────────────────────────
+
+http.interceptors.response.use(
+  (response: AxiosResponse) => {
+    const { status, config, data } = response;
+    const cached = response.headers?.["x-cache"] === "HIT";
+    console.groupCollapsed(`%c ↓ ${status} ${config.method?.toUpperCase()} ${config.url}${cached ? "  [CACHED]" : ""}`, `color:${status < 300 ? "#264653" : "#E76F51"}; font-weight:600;`);
+    console.log("Data:  ", data);
+    if (cached) console.log("%cServer cache HIT", "color:#A8DADC; font-weight:600;");
+    console.groupEnd();
+    return response;
+  },
+  (error: AxiosError) => {
+    const { response, config } = error;
+    console.groupCollapsed(`%c ✖ ${response?.status ?? "ERR"} ${config?.method?.toUpperCase()} ${config?.url}`, "color:#E76F51; font-weight:600;");
+    console.error("Message:", error.message);
+    if (response?.data) console.error("Response data:", response.data);
+    console.groupEnd();
+    return Promise.reject(error);
+  },
+);
+
+// ─── API client ───────────────────────────────────────────────────────────────
 
 export const apiClient = async <T = unknown>({ method, endpoint, data, params, skipCache = false }: ApiOptions): Promise<T> => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  // Cache POST requests using a stable key derived from body + endpoint.
+  // Client-side cache check (POST only)
   const cacheKey = method === "POST" && data ? buildJobsCacheKey({ endpoint, ...(data as Record<string, unknown>) }) : null;
 
   if (cacheKey && !skipCache) {
     const cached = getCached<T>(cacheKey);
-    if (cached) return cached;
-  }
-
-  let url = `${baseURL}${endpoint}`;
-
-  if (params && method === "GET") {
-    const queryParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      queryParams.append(key, String(value));
-    });
-    url += `?${queryParams.toString()}`;
-  }
-
-  const options = {
-    method,
-    url,
-    headers,
-    ...(params && method !== "GET" && { params }),
-    data,
-  };
-
-  try {
-    const response = await axios(options);
-    if (cacheKey) setCache<T>(cacheKey, response.data as T);
-    return response.data as T;
-  } catch (error: unknown) {
-    if (error instanceof AxiosError) {
-      if (error.response?.status !== 404) {
-        console.error("API Error:", error.message);
-      }
-    } else {
-      console.error("API Error:", "An unknown error occurred");
+    if (cached) {
+      console.log(`%c ✦ CLIENT CACHE HIT  ${endpoint}`, "color:#A8DADC; font-weight:600;");
+      return cached;
     }
-    throw error;
   }
+
+  // Build URL params for GET requests
+  let resolvedParams: Record<string, string> | undefined;
+  if (params && method === "GET") {
+    resolvedParams = Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]));
+  }
+
+  const response = await http.request<T>({
+    method,
+    url: endpoint,
+    data,
+    ...(resolvedParams ? { params: resolvedParams } : {}),
+    ...(params && method !== "GET" ? { params } : {}),
+  });
+
+  if (cacheKey) setCache<T>(cacheKey, response.data);
+  return response.data;
 };
