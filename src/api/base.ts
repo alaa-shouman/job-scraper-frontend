@@ -45,7 +45,7 @@ http.interceptors.response.use(
     const { status, config, data } = response;
     const cached = response.headers?.["x-cache"] === "HIT";
     console.groupCollapsed(`%c ↓ ${status} ${config.method?.toUpperCase()} ${config.url}${cached ? "  [CACHED]" : ""}`, `color:${status < 300 ? "#264653" : "#E76F51"}; font-weight:600;`);
-    console.log("Data:  ", data);
+    console.log("Data:  ", data ,response);
     if (cached) console.log("%cServer cache HIT", "color:#A8DADC; font-weight:600;");
     console.groupEnd();
     return response;

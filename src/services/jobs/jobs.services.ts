@@ -26,6 +26,7 @@ export const fetchJobs = async (params: FetchJobsParams, options: { skipCache?: 
       data: body,
       skipCache: options.skipCache,
     });
+    console.log('response :>> ', response);
     return response;
   } catch (error: unknown) {
     const err = error as { response?: { data?: { message?: string; error?: string } } };

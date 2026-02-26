@@ -33,7 +33,15 @@ export default function App() {
       startTimer();
       try {
         const res = await fetchJobs(params, { skipCache });
-        const normalised = res.jobs.map(normaliseJob);
+        const normalised = res.jobs
+          .map(normaliseJob)
+          .sort((a, b) => {
+            // Jobs without a date sink to the bottom
+            if (!a.datePosted && !b.datePosted) return 0;
+            if (!a.datePosted) return 1;
+            if (!b.datePosted) return -1;
+            return new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime();
+          });
         setJobs(normalised);
         setTotalJobs(res.total_jobs);
         setState("success");
