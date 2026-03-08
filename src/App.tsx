@@ -18,6 +18,8 @@ export default function App() {
   const [state, setState] = useState<AppState>("idle");
   const [jobs, setJobs] = useState<NormalisedJob[]>([]);
   const [totalJobs, setTotalJobs] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState("");
   const [activeFilter, setActiveFilter] = useState<SourceFilter>("all");
   const [lastParams, setLastParams] = useState<FetchJobsParams | null>(null);
@@ -25,29 +27,21 @@ export default function App() {
   const { elapsed, timerState, start: startTimer, stop: stopTimer } = useTimer();
 
   const runSearch = useCallback(
-    async (params: FetchJobsParams, skipCache = false) => {
+    async (params: FetchJobsParams, page = 1, skipCache = false) => {
       setState("loading");
       setActiveFilter("all");
       setErrorMessage("");
-      setLastParams(params);
+      setCurrentPage(page);
       startTimer();
+      const fullParams = { ...params, page };
       try {
-        const res = await fetchJobs(params, { skipCache });
-        const normalised = res.jobs
-          .map(normaliseJob)
-          .sort((a, b) => {
-            // Jobs without a date sink to the bottom
-            if (!a.datePosted && !b.datePosted) return 0;
-            if (!a.datePosted) return 1;
-            if (!b.datePosted) return -1;
-            return new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime();
-          });
-        setJobs(normalised);
+        const res = await fetchJobs(fullParams, { skipCache });
+        setJobs(res.jobs.map(normaliseJob));
         setTotalJobs(res.total_jobs);
+        setTotalPages(res.total_pages ?? 1);
         setState("success");
         stopTimer();
-        // Refresh cache status after fetch
-        setCacheStatus(getJobsCacheStatus(params));
+        setCacheStatus(getJobsCacheStatus(fullParams));
       } catch (err: unknown) {
         const e = err as { userMessage?: string };
         setErrorMessage(e.userMessage ?? "Failed to fetch jobs. Please try again.");
@@ -59,12 +53,17 @@ export default function App() {
   );
 
   const handleSearch = (params: FetchJobsParams) => {
-    runSearch(params);
+    setLastParams(params);
+    runSearch(params, 1);
+  };
+
+  const handlePageChange = (page: number) => {
+    if (lastParams) runSearch(lastParams, page);
   };
 
   const handleClearCache = () => {
     clearCache();
-    if (lastParams) runSearch(lastParams, true);
+    if (lastParams) runSearch(lastParams, currentPage, true);
   };
 
   // Source counts for FilterBar
@@ -108,14 +107,14 @@ export default function App() {
             </div>
             <p className="text-ink font-semibold text-lg mb-2">Start your job search</p>
             <p className="text-ink-mid text-sm max-w-md">
-              Add keywords to search LinkedIn &amp; Indeed, or a free-text query for Google Jobs.
+              Enter a search query to scrape LinkedIn &amp; Indeed. Use advanced options for
+              keyword matching, salary filters, experience levels, and more.
               Results are cached for 10 minutes.
             </p>
-            <div className="mt-8 grid grid-cols-3 gap-4 text-center">
+            <div className="mt-8 grid grid-cols-2 gap-4 text-center">
               {[
                 { icon: "💼", label: "LinkedIn", desc: "Professional network" },
                 { icon: "🔍", label: "Indeed", desc: "World's #1 job site" },
-                { icon: "🌐", label: "Google Jobs", desc: "Global job board" },
               ].map((s) => (
                 <div key={s.label} className="rounded-xl bg-surface border border-glacier/50 px-4 py-3">
                   <div className="text-2xl mb-1">{s.icon}</div>
@@ -156,6 +155,7 @@ export default function App() {
               />
               <p className="text-xs text-ink-mid shrink-0">
                 Showing {visibleJobs.length} of {totalJobs} jobs
+                {totalPages > 1 && ` · Page ${currentPage} of ${totalPages}`}
               </p>
             </div>
 
@@ -166,6 +166,35 @@ export default function App() {
                 {visibleJobs.map((job) => (
                   <JobCard key={job.id} job={job} />
                 ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 pt-4">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage <= 1 || state === "loading"}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-glacier/50 bg-surface px-4 py-2 text-sm font-medium text-ink-mid hover:text-ink hover:border-primary/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                  Prev
+                </button>
+                <span className="text-sm text-ink-mid font-medium">
+                  Page {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage >= totalPages || state === "loading"}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-glacier/50 bg-surface px-4 py-2 text-sm font-medium text-ink-mid hover:text-ink hover:border-primary/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  Next
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
               </div>
             )}
           </section>
