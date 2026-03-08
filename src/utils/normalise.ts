@@ -37,5 +37,7 @@ export function normaliseJob(job: Job): NormalisedJob {
     datePosted: job.date_posted,
     salary,
     jobType: job.job_type,
+    jobLevel: job.job_level,
+    relevanceScore: job.relevance_score,
   };
 }
