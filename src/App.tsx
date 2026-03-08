@@ -74,6 +74,8 @@ export default function App() {
     google: jobs.filter((j) => j?.source?.toLowerCase() === "google").length,
   };
 
+  const isLoading = state === "loading";
+
   const visibleJobs =
     activeFilter === "all"
       ? jobs
@@ -140,7 +142,7 @@ export default function App() {
         {state === "error" && (
           <ErrorState
             message={errorMessage}
-            onRetry={() => lastParams && runSearch(lastParams, true)}
+            onRetry={() => lastParams && runSearch(lastParams, currentPage, true)}
           />
         )}
 
@@ -174,7 +176,7 @@ export default function App() {
               <div className="flex items-center justify-center gap-3 pt-4">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage <= 1 || state === "loading"}
+                  disabled={currentPage <= 1 || isLoading}
                   className="inline-flex items-center gap-1.5 rounded-xl border border-glacier/50 bg-surface px-4 py-2 text-sm font-medium text-ink-mid hover:text-ink hover:border-primary/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -187,7 +189,7 @@ export default function App() {
                 </span>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage >= totalPages || state === "loading"}
+                  disabled={currentPage >= totalPages || isLoading}
                   className="inline-flex items-center gap-1.5 rounded-xl border border-glacier/50 bg-surface px-4 py-2 text-sm font-medium text-ink-mid hover:text-ink hover:border-primary/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                   Next
