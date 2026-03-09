@@ -87,7 +87,10 @@ export default function SearchForm({ onSearch, loading, elapsed = 0, timerState 
     const [currency, setCurrency] = useState("USD");
     const [excludeCountries, setExcludeCountries] = useState<string[]>([]);
     const [excludeCountryInput, setExcludeCountryInput] = useState("");
-    const [resultsWanted, setResultsWanted] = useState<number | "">(20);
+    const [resultsWanted, setResultsWanted] = useState<number | "">(25);
+    const [googleQuery, setGoogleQuery] = useState("");
+    const [skipGoogle, setSkipGoogle] = useState(false);
+    const [googleResultsWanted, setGoogleResultsWanted] = useState<number | "">(25);
     const [hoursOld, setHoursOld] = useState<number | "">("");
     const [limit, setLimit] = useState<number>(10);
 
@@ -160,7 +163,13 @@ export default function SearchForm({ onSearch, loading, elapsed = 0, timerState 
         if (maxSalary !== "") params.maxSalary = maxSalary as number;
         if ((minSalary !== "" || maxSalary !== "") && currency) params.currency = currency;
         if (excludeCountries.length) params.excludeCountries = excludeCountries;
-        if (resultsWanted !== "" && resultsWanted !== 20) params.resultsWanted = resultsWanted as number;
+        if (resultsWanted !== "" && resultsWanted !== 25) params.resultsWanted = resultsWanted as number;
+        if (skipGoogle) {
+            params.googleQuery = false;
+        } else if (googleQuery.trim()) {
+            params.googleQuery = googleQuery.trim();
+            if (googleResultsWanted !== "") params.googleResultsWanted = googleResultsWanted as number;
+        }
         if (hoursOld !== "") params.hoursOld = hoursOld as number;
         params.limit = limit;
 
@@ -422,6 +431,50 @@ export default function SearchForm({ onSearch, loading, elapsed = 0, timerState 
                             onInputChange={setExcludeCountryInput}
                             onKeyDown={excludeCountriesHandlers.onKeyDown}
                         />
+                    </div>
+
+                    {/* Google Jobs */}
+                    <div className="space-y-3 rounded-xl border border-glacier/50 bg-bg/50 p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-ink">Google Jobs</p>
+                                <p className="text-xs text-ink-mid">Scraped in parallel — wider coverage from dozens of job boards.</p>
+                            </div>
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={!skipGoogle}
+                                onClick={() => setSkipGoogle((v) => !v)}
+                                className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-colors ${!skipGoogle ? "bg-primary" : "bg-glacier"}`}
+                            >
+                                <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${!skipGoogle ? "translate-x-4" : "translate-x-0"}`} />
+                            </button>
+                        </div>
+                        {!skipGoogle && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-ink-mid mb-1.5">Google Query Override</label>
+                                    <input
+                                        type="text"
+                                        value={googleQuery}
+                                        onChange={(e) => setGoogleQuery(e.target.value)}
+                                        placeholder="Defaults to main query"
+                                        className="w-full rounded-xl bg-bg border border-glacier focus:border-primary outline-none px-3 py-2 text-sm text-ink placeholder:text-ink-soft transition-colors"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-ink-mid mb-1.5">Google Results Wanted</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={100}
+                                        value={googleResultsWanted}
+                                        onChange={(e) => setGoogleResultsWanted(e.target.value === "" ? "" : Number(e.target.value))}
+                                        className="w-full rounded-xl bg-bg border border-glacier focus:border-primary outline-none px-3 py-2 text-sm text-ink transition-colors"
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Results, Recency, Per Page */}

@@ -80,6 +80,8 @@ export interface FetchJobsParams {
   experienceLevels?: ExperienceLevel[];
   sites?: ("linkedin" | "indeed")[];
   resultsWanted?: number;
+  googleQuery?: string | false;
+  googleResultsWanted?: number;
   hoursOld?: number;
 }
 

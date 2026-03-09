@@ -23,6 +23,9 @@ function buildJobsBody(params: FetchJobsParams): Record<string, unknown> {
   if (params.experienceLevels?.length) body.experienceLevels = params.experienceLevels;
   if (params.sortBy) body.sortBy = params.sortBy;
   if (params.resultsWanted !== undefined) body.resultsWanted = params.resultsWanted;
+  // googleQuery can be false (skip Google) or a string override
+  if (params.googleQuery !== undefined) body.googleQuery = params.googleQuery;
+  if (params.googleResultsWanted !== undefined) body.googleResultsWanted = params.googleResultsWanted;
   if (params.hoursOld !== undefined) body.hoursOld = params.hoursOld;
   if (params.page !== undefined) body.page = params.page;
   if (params.limit !== undefined) body.limit = params.limit;
